@@ -2,6 +2,8 @@ package test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import code.JDBCConnection;
@@ -46,15 +48,23 @@ public class JDBCConnectionTest {
 		c.setPassword("password1");
 		assertEquals("The database url set has failed",c.getPassword(),"password1");	
 	}
-	@Test
-	public void ConnectionTest() {
-		JDBCConnection c = new JDBCConnection("jdbc:mysql://localhost/db_ticketBook", "root", "password");
-		c.Connect();
-	}
+
 	@Test 
 	public void ReadTest() {
 		JDBCConnection c = new JDBCConnection("jdbc:mysql://localhost/db_ticketBook", "root", "password");
-		
+		c.Connect();
+		ArrayList<String> returnData = new ArrayList<>();
+		returnData.add("A good band name,A good band description");
+		assertEquals("Reading/returning data from the database",returnData.get(0),c.Read("tbl_band", "bandName, bandDescription").get(0));	
+	}
+	@Test
+	public void InsertTest() {
+		JDBCConnection c = new JDBCConnection("jdbc:mysql://localhost/db_ticketBook", "root", "password");
+		c.Connect();
+		c.Create("tbl_band", "bandName, bandDescription", "'A good band name','A good band description'");
+		ArrayList<String> returnData = new ArrayList<>();
+		returnData.add("A good band name,A good band description");
+		assertEquals("Reading/returning data from the database",returnData.get(0),c.Read("tbl_band", "bandName, bandDescription").get(3));	
 	}
 
 }

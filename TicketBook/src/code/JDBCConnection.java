@@ -9,8 +9,9 @@ public final class JDBCConnection {
 	private String username;
 	private String password;
 	private Connection conn;
-	
 	private Statement stmt;
+	
+	private ArrayList<String> returnedList;
 	
 	public JDBCConnection(String DB_URL,String Username,String Password){
 		this.dB_URL = DB_URL;
@@ -42,6 +43,10 @@ public final class JDBCConnection {
 		this.password = password;
 	}
 	
+	public ArrayList<String> getReturnedList() {
+		return returnedList;
+	}
+	
 	public void Connect() {
 		conn= null;
 		stmt= null;
@@ -60,16 +65,8 @@ public final class JDBCConnection {
 		}
 	}
 	
-	public void Create(String table, ArrayList<String> List ) {
-		String listAsString = "(";
-		for(int i = 0; i <List.size();i++) {
-			listAsString += List.get(i);
-			if(i == List.size()-1) {
-				listAsString += ")";
-			}else {
-				listAsString += ",";
-			}
-		}
+	public void Create(String table, String columnList, String valuesList) {
+
 		System.out.println("Inserting records into the table...");
 		try {
 			stmt = this.conn.createStatement();
@@ -77,19 +74,22 @@ public final class JDBCConnection {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String sql= "INSERT INTO "+table +" VALUES "+listAsString;
+		String sql= "INSERT INTO "+table +" ("+ columnList+") VALUES ("+valuesList+")";
+		System.out.println(sql);
 		try {
 			stmt.executeUpdate(sql);
+			System.out.println("Inserted records into the table...");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Inserted records into the table...");
 	}
 	
-	public ArrayList<String> Read(String table,ArrayList<String> list) {
+	public ArrayList<String> Read(String table,String columnString) {
 		
-		ArrayList<String> returnedList = new ArrayList<String>();
+		returnedList = new ArrayList<String>();
+		
+		int columnCount = 0;
 		
 		System.out.println("Creating statement...");
 		try {
@@ -98,29 +98,33 @@ public final class JDBCConnection {
 			System.out.println("stmt = conn creation statment error exception");
 			e1.printStackTrace();
 		}
-		String listAsString = "";
-		for(int i = 0; i <list.size();i++) {
-			listAsString += list.get(i);
-			if(i != list.size()-1) {
-				listAsString += ",";
+		for ( int i = 0; i < columnString.length(); i++ ) {
+			if(columnString.charAt(i) == ',') {
+				columnCount++;
 			}
-		}
-		String sql= "SELECT "+listAsString+" FROM "+table;
+        }
+		columnCount++;
+		System.out.println(columnCount);
+		String sql= "SELECT "+columnString+" FROM "+table;
+		System.out.println(sql);
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
 		} catch (SQLException e) {
-			System.out.println("using ther query and collecting results set ");
+			System.out.println("using the query and collecting results set failed ");
 			e.printStackTrace();
 		}
 		try {
 			while(rs.next()) {
 				String itemString = "";
-				for(int i = 0; i < list.size();i++) {
-					itemString += rs.getString(i);
-					System.out.println(list.get(i)+ " : "+ returnedList.get(i));
+				for(int i = 0; i < columnCount;i++) {
+					itemString += rs.getString(i+1);
+					if(i+1 < columnCount) {
+						itemString += ",";
+					}
 				}
 				returnedList.add(itemString);
+				System.out.println(itemString);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
