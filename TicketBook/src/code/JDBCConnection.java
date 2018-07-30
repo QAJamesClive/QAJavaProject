@@ -78,6 +78,7 @@ public final class JDBCConnection {
 		System.out.println(sql);
 		try {
 			stmt.executeUpdate(sql);
+			System.out.println(sql);
 			System.out.println("Inserted records into the table...");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -136,5 +137,22 @@ public final class JDBCConnection {
 			e.printStackTrace();
 		}
 		return returnedList;
+	}
+	
+	public void Update(String table,String coulmn,String value,String refColumn,String ref) {
+		System.out.println("Creating statement...");
+		try {
+			stmt= conn.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String sql= "UPDATE "+table + " SET "+ coulmn + " = " + value + " WHERE "+refColumn+ "in ("+ ref +")";
+		try {
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

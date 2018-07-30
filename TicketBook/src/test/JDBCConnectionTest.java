@@ -66,5 +66,12 @@ public class JDBCConnectionTest {
 		returnData.add("A good band name,A good band description");
 		assertEquals("Reading/returning data from the database",returnData.get(0),c.Read("tbl_band", "bandName, bandDescription").get(3));	
 	}
+	@Test
+	public void UpdateTest() {
+		JDBCConnection c = new JDBCConnection("jdbc:mysql://localhost/db_ticketBook", "root", "password");
+		c.Connect();
+		c.Update("tbl_band", "bandName", "A exceptional band name", "bandIDPK", "0");
+		assertEquals("Reading/returning data from the database",c.Read("tbl_band", "bandName, bandDescription").get(0));
+	}
 
 }
