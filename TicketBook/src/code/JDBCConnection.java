@@ -155,4 +155,21 @@ public final class JDBCConnection {
 			e.printStackTrace();
 		}
 	}
+	
+	public void Delete(String table,String column,String ref) {
+		System.out.println("Creating statement...");
+		try {
+			stmt= conn.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String sql4= "DELETE FROM" +table + " WHERE " + column+" = "+ref;
+		try {
+			stmt.executeUpdate(sql4);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
