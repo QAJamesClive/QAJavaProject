@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import code.JDBCConnection;
+import code.JDBC;
 
-public class JDBCConnectionTest {
+public class JDBCTest {
 	
-	JDBCConnection c = new JDBCConnection("jdbc:mysql://localhost/db_ticketBook", "root", "password");
+	JDBC c = new JDBC("jdbc:mysql://localhost/db_ticketBook", "root", "password");
 
 	@Test
 	public void constructorTest() {
@@ -43,14 +43,6 @@ public class JDBCConnectionTest {
 		c.setPassword("password1");
 		assertEquals("The database url set has failed",c.getPassword(),"password1");	
 	}
-
-	@Test 
-	public void ReadTest() {
-		c.Connect();
-		ArrayList<String> returnData = new ArrayList<>();
-		returnData.add("A good band name,A good band description");
-		assertEquals("Reading/returning data from the database",returnData.get(0),c.Read("tbl_band", "bandName, bandDescription").get(0));	
-	}
 	@Test
 	public void InsertTest() {
 		c.Connect();
@@ -62,8 +54,9 @@ public class JDBCConnectionTest {
 	@Test
 	public void UpdateTest() {
 		c.Connect();
-		c.Update("tbl_band", "bandName", "A exceptional band name", "bandIDPK", "0");
-		assertEquals("Reading/returning data from the database",c.Read("tbl_band", "bandName, bandDescription").get(0));
+		c.Update("tbl_band", "bandName", "A exceptional band name", "bandIDPK", "2");
+		System.out.println(c.Read("tbl_band", "bandName, bandDescription").get(0).toString());
+		assertEquals("Reading/returning data from the database",c.Read("tbl_band", "bandName, bandDescription").get(0).toString(),"A exceptional band name,A good band description");
 	}
 	@Test
 	public void DeleteTest() {

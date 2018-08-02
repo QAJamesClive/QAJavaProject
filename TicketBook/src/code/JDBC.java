@@ -3,7 +3,7 @@ package code;
 import java.sql.*;
 import java.util.ArrayList;
 
-public final class JDBCConnection {
+public final class JDBC {
 
 	private String dB_URL;
 	private String username;
@@ -13,7 +13,7 @@ public final class JDBCConnection {
 	
 	private ArrayList<String> returnedList;
 	
-	public JDBCConnection(String DB_URL,String Username,String Password){
+	public JDBC(String DB_URL,String Username,String Password){
 		this.dB_URL = DB_URL;
 		this.username = Username;
 		this.password = Password;
@@ -43,46 +43,32 @@ public final class JDBCConnection {
 		this.password = password;
 	}
 	
-	public ArrayList<String> getReturnedList() {
-		return returnedList;
-	}
-	
 	public void Connect() {
 		conn= null;
 		stmt= null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
-		System.out.println("Connecting to database...");
 		try {
-			conn = DriverManager.getConnection(dB_URL, username, password);
+			conn = DriverManager.getConnection(dB_URL+"?useSSL=false", username, password);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Failed database connection creation");
 		}
 	}
 	
 	public void Create(String table, String columnList, String valuesList) {
-
-		System.out.println("Inserting records into the table...");
+		
 		try {
 			stmt = this.conn.createStatement();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		String sql= "INSERT INTO "+table +" ("+ columnList+") VALUES ("+valuesList+")";
-		System.out.println(sql);
 		try {
 			stmt.executeUpdate(sql);
-			System.out.println(sql);
-			System.out.println("Inserted records into the table...");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Failed database row insert");
 		}
 	}
 	
@@ -92,12 +78,10 @@ public final class JDBCConnection {
 		
 		int columnCount = 0;
 		
-		System.out.println("Creating statement...");
 		try {
 			stmt= conn.createStatement();
 		} catch (SQLException e1) {
-			System.out.println("stmt = conn creation statment error exception");
-			e1.printStackTrace();
+
 		}
 		for ( int i = 0; i < columnString.length(); i++ ) {
 			if(columnString.charAt(i) == ',') {
@@ -105,15 +89,12 @@ public final class JDBCConnection {
 			}
         }
 		columnCount++;
-		System.out.println(columnCount);
 		String sql= "SELECT "+columnString+" FROM "+table;
-		System.out.println(sql);
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
 		} catch (SQLException e) {
-			System.out.println("using the query and collecting results set failed ");
-			e.printStackTrace();
+			System.out.println("Failed database read");
 		}
 		try {
 			while(rs.next()) {
@@ -125,16 +106,13 @@ public final class JDBCConnection {
 					}
 				}
 				returnedList.add(itemString);
-				System.out.println(itemString);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}try {
 			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		return returnedList;
 	}
@@ -144,9 +122,9 @@ public void Update(String table,String coulmn,String value,String refColumn,Stri
 		try {
 			stmt= conn.createStatement();
 		} catch (SQLException e) {
-			System.out.println("Failed creating Update statement");
+
 		}
-		String sql= "UPDATE "+table + " SET "+ coulmn + " = " + value + " WHERE "+refColumn+ "= ("+ ref +")";
+		String sql= "UPDATE "+table + " SET "+ coulmn + " = '" + value + "' WHERE "+refColumn+ "= ("+ ref +")";
 		try {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
