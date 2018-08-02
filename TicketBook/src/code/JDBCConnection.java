@@ -139,37 +139,34 @@ public final class JDBCConnection {
 		return returnedList;
 	}
 	
-	public void Update(String table,String coulmn,String value,String refColumn,String ref) {
-		System.out.println("Creating statement...");
+public void Update(String table,String coulmn,String value,String refColumn,String ref) {
+		
 		try {
 			stmt= conn.createStatement();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Failed creating Update statement");
 		}
-		String sql= "UPDATE "+table + " SET "+ coulmn + " = " + value + " WHERE "+refColumn+ "in ("+ ref +")";
+		String sql= "UPDATE "+table + " SET "+ coulmn + " = " + value + " WHERE "+refColumn+ "= ("+ ref +")";
 		try {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("failed update");
 		}
 	}
 	
 	public void Delete(String table,String column,String ref) {
-		System.out.println("Creating statement...");
 		try {
 			stmt= conn.createStatement();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Failed to create delete");
 		}
-		String sql4= "DELETE FROM" +table + " WHERE " + column+" = "+ref;
+		String sql4= "DELETE FROM " +table + " WHERE " + column+" = ("+ref+")";
 		try {
 			stmt.executeUpdate(sql4);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Failed to delete");
 		}
 	}
 }
