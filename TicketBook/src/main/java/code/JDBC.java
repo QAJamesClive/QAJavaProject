@@ -3,6 +3,9 @@ package code;
 import java.sql.*;
 import java.util.ArrayList;
 
+import org.json.JSONML;
+import org.json.JSONObject;
+
 
 public final class JDBC {
 
@@ -73,9 +76,11 @@ public final class JDBC {
 		}
 	}
 	
-	public ArrayList<String> Read(String table,String columnString) {
+	public 	JSONObject Read(String table,String columnString) {
 		
 		returnedList = new ArrayList<String>();
+		JSONObject returnedJSon = new JSONObject();
+		int rowNumber = 0;
 		
 		int columnCount = 0;
 		
@@ -97,25 +102,75 @@ public final class JDBC {
 		} catch (SQLException e) {
 			System.out.println("Failed database read");
 		}
+		ResultSetMetaData rsmd = null;
+		try {
+			rsmd = rs.getMetaData();
+		} catch (SQLException e1) {
+		}
 		try {
 			while(rs.next()) {
-				String itemString = "";
+				JSONObject rowJSon = new JSONObject();
 				for(int i = 0; i < columnCount;i++) {
-					itemString += rs.getString(i+1);
-					if(i+1 < columnCount) {
-						itemString += ",";
-					}
+					rowJSon.put(rsmd.getColumnName(i+1), rs.getString(i+1));
+					rowNumber = rs.getRow();
 				}
-				returnedList.add(itemString);
+				returnedJSon.put(Integer.toString(rowNumber), rowJSon);
 			}
 		} catch (SQLException e) {
-
-		}try {
-			rs.close();
+		}
+		try {rs.close();
 		} catch (SQLException e) {
 
 		}
-		return returnedList;
+		return returnedJSon;
+	}
+	public 	JSONObject Read(String table,String columnString,String refColumn,String ref) {
+		
+		returnedList = new ArrayList<String>();
+		JSONObject returnedJSon = new JSONObject();
+		int rowNumber = 0;
+		
+		int columnCount = 0;
+		
+		try {
+			stmt= conn.createStatement();
+		} catch (SQLException e1) {
+
+		}
+		for ( int i = 0; i < columnString.length(); i++ ) {
+			if(columnString.charAt(i) == ',') {
+				columnCount++;
+			}
+        }
+		columnCount++;
+		String sql= "SELECT "+columnString+" FROM "+table+" WHERE "+refColumn+ " = ("+ ref +")";
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			System.out.println("Failed database read");
+		}
+		ResultSetMetaData rsmd = null;
+		try {
+			rsmd = rs.getMetaData();
+		} catch (SQLException e1) {
+		}
+		try {
+			while(rs.next()) {
+				JSONObject rowJSon = new JSONObject();
+				for(int i = 0; i < columnCount;i++) {
+					rowJSon.put(rsmd.getColumnName(i+1), rs.getString(i+1));
+					rowNumber = rs.getRow();
+				}
+				returnedJSon.put(Integer.toString(rowNumber), rowJSon);
+			}
+		} catch (SQLException e) {
+		}
+		try {rs.close();
+		} catch (SQLException e) {
+
+		}
+		return returnedJSon;
 	}
 	
 public void Update(String table,String coulmn,String value,String refColumn,String ref) {

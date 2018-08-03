@@ -1,17 +1,13 @@
 package test;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
-
-import org.junit.Test;
 
 import code.JDBC;
 
 public class JDBCTest {
 	
 	JDBC c = new JDBC("jdbc:mysql://localhost/db_ticketBook", "root", "password");
-
+	
 	@Test
 	public void constructorTest() {
 		assertNotNull(c);		
