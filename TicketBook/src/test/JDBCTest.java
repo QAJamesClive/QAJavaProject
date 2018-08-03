@@ -1,58 +1,73 @@
 package test;
 
-import java.util.ArrayList;
+
+import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import code.JDBC;
 
 public class JDBCTest {
 	
 	JDBC c = new JDBC("jdbc:mysql://localhost/db_ticketBook", "root", "password");
+	static JSONObject TestJSon;
+	static JSONObject TestUpdateJSon;
 	
+	@BeforeAll
+	public static void PriorRequirements() {
+		TestJSon = new JSONObject();
+		TestJSon.put("bandName", "A good band name");
+		TestJSon.put("bandDescription", "A good band description");
+		TestUpdateJSon = new JSONObject();
+		TestUpdateJSon.put("bandName", "A exceptional band name");
+		TestUpdateJSon.put("bandDescription", "A good band description");
+	}
 	@Test
 	public void constructorTest() {
-		assertNotNull(c);		
+		Assertions.assertNotNull(c);		
 	}
 	@Test
 	public void getdB_URLTest() {
-		assertEquals("The database url get has failed",c.getdB_URL(),"jdbc:mysql://localhost/db_ticketBook");	
+		Assertions.assertEquals(c.getdB_URL(),"jdbc:mysql://localhost/db_ticketBook","The database url get has failed");	
 	}
 	@Test
 	public void setdB_URLTest() {
 		c.setdB_URL("url");
-		assertEquals("The database url set has failed",c.getdB_URL(),"url");	
+		Assertions.assertEquals(c.getdB_URL(),"url","The database url set has failed");	
 	}
 	@Test
 	public void getUsernameTest() {
-		assertEquals("The database url get has failed",c.getUsername(),"root");	
+		Assertions.assertEquals(c.getUsername(),"root","The database url get has failed");	
 	}
 	@Test
 	public void setusernameTest() {
 		c.setUsername("public");
-		assertEquals("The database url set has failed",c.getUsername(),"public");	
+		Assertions.assertEquals(c.getUsername(),"public","The database url set has failed");	
 	}
 	@Test
 	public void getPasswordTest() {
-		assertEquals("The database url get has failed",c.getPassword(),"password");	
+		Assertions.assertEquals(c.getPassword(),"password","The database url get has failed");	
 	}
 	@Test
 	public void setPasswordTest() {
 		c.setPassword("password1");
-		assertEquals("The database url set has failed",c.getPassword(),"password1");	
+		Assertions.assertEquals(c.getPassword(),"password1","The database url set has failed");	
 	}
 	@Test
 	public void InsertTest() {
 		c.Connect();
 		c.Create("tbl_band", "bandName, bandDescription", "'A good band name','A good band description'");
-		ArrayList<String> returnData = new ArrayList<>();
-		returnData.add("A good band name,A good band description");
-		assertEquals("Reading/returning data from the database",returnData.get(0),c.Read("tbl_band", "bandName, bandDescription").get(3));	
+		JSONObject js = (JSONObject) c.Read("tbl_band", "bandName, bandDescription").get("2");
+		Assertions.assertEquals(TestJSon.get("bandName"),js.get("bandName"),"Reading/returning data from the database");	
 	}
 	@Test
 	public void UpdateTest() {
 		c.Connect();
 		c.Update("tbl_band", "bandName", "A exceptional band name", "bandIDPK", "2");
-		System.out.println(c.Read("tbl_band", "bandName, bandDescription").get(0).toString());
-		assertEquals("Reading/returning data from the database",c.Read("tbl_band", "bandName, bandDescription").get(0).toString(),"A exceptional band name,A good band description");
+		JSONObject js = (JSONObject) (c.Read("tbl_band", "bandName, bandDescription").get("1"));
+		System.out.print(js);
+		Assertions.assertEquals(TestUpdateJSon.get("bandName"),js.get("bandName"),"Update data in the database");
 	}
 	@Test
 	public void DeleteTest() {
